@@ -1,0 +1,101 @@
+# Default values for llama-inference
+replicaCount: 1
+
+image:
+  repository: docker.io/ollama/ollama
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Llama model configuration
+model:
+  # Model to pull on startup (llama3.2, llama3.2:1b, llama2, llama2:7b, etc.)
+  name: "llama3.2:1b"
+  # Auto-pull model on startup
+  autoPull: true
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 11434
+  targetPort: 11434
+  annotations: {}
+
+route:
+  enabled: true
+  annotations: {}
+  host: ""
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+resources:
+  limits:
+    cpu: 4
+    memory: 8Gi
+  requests:
+    cpu: 2
+    memory: 4Gi
+
+# Persistent storage for models
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 20Gi
+  mountPath: /root/.ollama
+  annotations: {}
+
+# Probes
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Environment variables
+env: []
+  # - name: OLLAMA_HOST
+  #   value: "0.0.0.0"
+
+# Additional volumes
+extraVolumes: []
+
+# Additional volume mounts
+extraVolumeMounts: []

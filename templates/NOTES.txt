@@ -1,0 +1,49 @@
+1. Get the application URL by running these commands:
+{{- if .Values.route.enabled }}
+  export ROUTE_HOST=$(oc get route {{ include "llama-inference.fullname" . }} -o jsonpath='{.spec.host}')
+  echo "Llama inference API available at: https://$ROUTE_HOST"
+{{- else }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "llama-inference.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  echo "Visit http://127.0.0.1:11434 to access Ollama"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 11434:11434
+{{- end }}
+
+2. Test the model with:
+  curl https://$ROUTE_HOST/api/generate -d '{
+    "model": "{{ .Values.model.name }}",
+    "prompt": "Why is the sky blue?",
+    "stream": false
+  }'
+
+3. List available models:
+  curl https://$ROUTE_HOST/api/tags
+
+4. Check model pull status:
+  oc logs -f deployment/{{ include "llama-inference.fullname" . }} -c pull-model
+
+Model: {{ .Values.model.name }}
+Auto-pull enabled: {{ .Values.model.autoPull }}
+```
+
+## 10. .helmignore
+```
+# Patterns to ignore when packaging
+.git/
+.gitignore
+.DS_Store
+*.swp
+*.bak
+*.tmp
+*.log
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
