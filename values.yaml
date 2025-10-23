@@ -59,7 +59,7 @@ persistence:
   storageClass: ""
   accessMode: ReadWriteOnce
   size: 20Gi
-  mountPath: /root/.ollama
+  mountPath: /tmp/.ollama
   annotations: {}
 
 # Probes
@@ -90,9 +90,12 @@ tolerations: []
 affinity: {}
 
 # Environment variables
-env: []
-  # - name: OLLAMA_HOST
-  #   value: "0.0.0.0"
+env:
+  - name: HOME
+    value: /.ollama
+  - name: OLLAMA_MODELS
+    value: /tmp/models
+
 
 # Additional volumes
 extraVolumes: []
